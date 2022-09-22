@@ -12,13 +12,11 @@
 	},
 	"tauri": {
 		"allowlist": {
-			"http": {
-				"all": true,
-				"request": true,
-				"scope": [
-					"https://**",
-					"http://**"
-				]
+			"dialog": {
+				"all": true
+			},
+			"fs": {
+				"all": true
 			}
 		},
 		"bundle": {
@@ -63,10 +61,10 @@
 		"windows": [
 			{
 				"fullscreen": false,
-				"height": 600,
-				"resizable": true,
-				"title": "Vite Tauri Template",
-				"width": 800
+				"height": 200,
+				"resizable": false,
+				"title": "PAC Print Preparer",
+				"width": 300
 			}
 		]
 	}

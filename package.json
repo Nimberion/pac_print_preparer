@@ -1,39 +1,45 @@
 {
-  "name": "vite-tauri-template",
-  "description": "Vite + Tauri + Vuetify bundled together to use",
-  "private": true,
-  "version": "1.0.0",
-  "type": "module",
-  "scripts": {
-    "serve": "vite",
-    "serve:tauri": "set VITE_NETWORK_PROCESSOR=tauri && vite",
-    "serve:native": "tauri dev",
-    "build": "set VITE_NETWORK_PROCESSOR=tauri vite build && tauri build",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "@tauri-apps/api": "1.0.2",
-    "unified-network": "0.4.0",
-    "vue": "3.2.37"
-  },
-  "devDependencies": {
-    "@babel/eslint-parser": "^7.19.1",
-    "@tauri-apps/cli": "1.0.5",
-    "@types/node": "^18.7.18",
-    "@typescript-eslint/eslint-plugin": "^5.38.0",
-    "@typescript-eslint/parser": "^5.38.0",
-    "@vitejs/plugin-vue": "3.0.1",
-    "eslint": "^8.23.1",
-    "eslint-config-prettier": "^8.5.0",
-    "eslint-plugin-prettier": "^4.2.1",
-    "eslint-plugin-vue": "^9.5.1",
-    "prettier": "^2.7.1",
-    "typescript": "^4.8.3",
-    "vite": "3.0.3",
-    "vue-eslint-parser": "^9.1.0"
-  },
-  "main": "index.js",
-  "repository": "git@github.com:yooneskh/vite-vuetify-template.git",
-  "author": "Nimberion",
-  "license": "MIT"
+	"name": "vite-tauri-template",
+	"description": "Vite + Tauri + Vuetify bundled together to use",
+	"private": true,
+	"version": "1.0.0",
+	"type": "module",
+	"scripts": {
+		"serve": "vite",
+		"serve:tauri": "set VITE_NETWORK_PROCESSOR=tauri && vite",
+		"serve:native": "tauri dev",
+		"build": "set VITE_NETWORK_PROCESSOR=tauri vite build && tauri build",
+		"preview": "vite preview",
+		"vue-devtools": "vue-devtools"
+	},
+	"dependencies": {
+		"@tauri-apps/api": "1.0.2",
+		"unified-network": "0.4.0",
+		"vue": "3.2.37"
+
+	},
+	"devDependencies": {
+		"@babel/eslint-parser": "^7.19.1",
+		"@tauri-apps/cli": "1.0.5",
+		"@types/node": "^18.7.18",
+		"@typescript-eslint/eslint-plugin": "^5.38.0",
+		"@typescript-eslint/parser": "^5.38.0",
+		"@vitejs/plugin-vue": "3.0.1",
+		"autoprefixer": "^10.4.12",
+		"eslint": "^8.23.1",
+		"eslint-config-prettier": "^8.5.0",
+		"eslint-plugin-prettier": "^4.2.1",
+		"eslint-plugin-vue": "^9.5.1",
+		"postcss": "^8.4.16",
+		"prettier": "^2.7.1",
+		"tailwindcss": "^3.1.8",
+		"@tailwindcss/forms": "^0.5.3",
+		"typescript": "^4.8.3",
+		"vite": "3.0.3",
+		"vue-eslint-parser": "^9.1.0"
+	},
+	"main": "index.js",
+	"repository": "git@github.com:yooneskh/vite-vuetify-template.git",
+	"author": "Nimberion",
+	"license": "MIT"
 }
