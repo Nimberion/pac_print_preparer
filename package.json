@@ -1,6 +1,6 @@
 {
-	"name": "vite-tauri-template",
-	"description": "Vite + Tauri + Vuetify bundled together to use",
+	"name": "pac_print_preparer",
+	"description": "",
 	"private": true,
 	"version": "1.0.0",
 	"type": "module",
@@ -8,18 +8,20 @@
 		"serve": "vite",
 		"serve:tauri": "set VITE_NETWORK_PROCESSOR=tauri && vite",
 		"serve:native": "tauri dev",
-		"build": "set VITE_NETWORK_PROCESSOR=tauri vite build && tauri build",
+		"build": "set VITE_NETWORK_PROCESSOR=tauri && vite build && tauri build",
 		"preview": "vite preview",
 		"vue-devtools": "vue-devtools"
 	},
 	"dependencies": {
 		"@tauri-apps/api": "1.0.2",
+		"@types/pdfjs-dist": "^2.10.378",
+		"pdfjs-dist": "^2.16.105",
 		"unified-network": "0.4.0",
 		"vue": "3.2.37"
-
 	},
 	"devDependencies": {
 		"@babel/eslint-parser": "^7.19.1",
+		"@tailwindcss/forms": "^0.5.3",
 		"@tauri-apps/cli": "1.0.5",
 		"@types/node": "^18.7.18",
 		"@typescript-eslint/eslint-plugin": "^5.38.0",
@@ -33,13 +35,12 @@
 		"postcss": "^8.4.16",
 		"prettier": "^2.7.1",
 		"tailwindcss": "^3.1.8",
-		"@tailwindcss/forms": "^0.5.3",
 		"typescript": "^4.8.3",
 		"vite": "3.0.3",
 		"vue-eslint-parser": "^9.1.0"
 	},
 	"main": "index.js",
 	"repository": "git@github.com:yooneskh/vite-vuetify-template.git",
-	"author": "Nimberion",
+	"author": "nimberion",
 	"license": "MIT"
 }

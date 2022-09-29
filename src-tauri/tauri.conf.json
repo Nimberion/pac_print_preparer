@@ -7,7 +7,7 @@
 		"distDir": "../dist"
 	},
 	"package": {
-		"productName": "vite-tauri-template",
+		"productName": "pac_print_preparer",
 		"version": "0.1.0"
 	},
 	"tauri": {
@@ -21,7 +21,7 @@
 		},
 		"bundle": {
 			"active": true,
-			"category": "DeveloperTool",
+			"category": "Utility",
 			"copyright": "",
 			"deb": {
 				"depends": []
@@ -34,7 +34,7 @@
 				"icons/icon.icns",
 				"icons/icon.ico"
 			],
-			"identifier": "com.khoshghadam.vite-tauri",
+			"identifier": "de.nimberion.pac-print-preparer",
 			"longDescription": "",
 			"macOS": {
 				"entitlements": null,
