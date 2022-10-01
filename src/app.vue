@@ -118,17 +118,20 @@
 
 	async function editFile() {
 		if (changeInformation.value.length > 0) {
-			const pdfDoc = await PDFDocument.load(file.value);
+			const oldPdf = await PDFDocument.load(file.value);
 
 			changeInformation.value.forEach((item) => {
 				if (item.type === "delete") {
-					pdfDoc.removePage(item.index);
+					oldPdf.removePage(item.index);
 				} else {
-					pdfDoc.insertPage(item.index + 1, PageSizes.A4);
+					oldPdf.insertPage(item.index + 1, PageSizes.A4);
 				}
 			});
 
-			file.value = await pdfDoc.save();
+			//COPIE FILE TO REMOVE PAGE STRUCTURE DATA ERROR
+			const newPdf = await oldPdf.copy();
+
+			file.value = await newPdf.save();
 		}
 	}
 
