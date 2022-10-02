@@ -1,73 +1,145 @@
 <template>
 	<div class="text-center text-sm grid grid-rows-[28px_108px_32px] place-items-center p-4">
 		<h1 class="text-xl font-bold">PAC Print Preparer</h1>
-
-		<div v-if="fileName" class="text-sm">
-			<div>Datei:</div>
-			<div>{{ fileName }}</div>
+		<div class="w-full">
+			<!-- LOADING BAR -->
+			<div v-if="isLoading" class="h-3 w-full border border-gray-400 mb-1">
+				<div class="h-full bg-gray-300 text-center text-white text-xs" :style="`width: ${progress}%;`"></div>
+			</div>
+			<div>{{ msg }}</div>
+			<!-- <div :title="argument">{{ argument }}</div> -->
 		</div>
-		<div v-else class="">Ziehe die zu bearbeitende Datei in das Fenster oder wähle sie über den Button aus.</div>
-		<div>
-			<!-- <button class="w-28 mx-2 px-2 py-1 border border-gray-400 bg-gray-300 rounded-sm hover:bg-gray-100" @click="selectFile">
-				Öffnen</button> -->
-			<button class="w-28 mx-2 px-2 py-1 border border-gray-400 bg-gray-300 rounded-sm hover:bg-gray-100" @click="cleanFile">
-				Starten
-			</button>
-		</div>
+		<button
+			class="w-28 mx-2 px-2 py-1 border border-gray-400 bg-gray-300 rounded-sm place-content-center flex"
+			:class="{ 'hover:bg-gray-200': !isLoading }"
+			:disabled="isLoading"
+			@click="cleanFile"
+		>
+			<div v-if="!isLoading">{{ btn }}</div>
+			<!-- SPINNER -->
+			<div v-else class="animate-spin w-5 h-5 border-4 border-b-transparent border-gray-500 rounded-full" role="status"></div>
+		</button>
 	</div>
 </template>
 
 <script setup lang="ts">
-	import { Ref, ref } from "vue";
+	import { Ref, ref, onMounted } from "vue";
+	import { getMatches } from "@tauri-apps/api/cli";
 	import { open } from "@tauri-apps/api/dialog";
+	import { once } from "@tauri-apps/api/event";
 	import { readBinaryFile, writeBinaryFile } from "@tauri-apps/api/fs";
+	import { exit } from "@tauri-apps/api/process";
 	import { getDocument, GlobalWorkerOptions } from "pdfjs-dist";
 	import worker from "pdfjs-dist/build/pdf.worker.entry";
 	import { PageSizes, PDFDocument } from "pdf-lib";
 	import { TextItem } from "pdfjs-dist/types/src/display/api";
 
-	const filePath = ref("") as Ref<string>;
-	const fileName = ref("") as Ref<string>;
-	const file = ref() as Ref<Uint8Array>;
-	const changeInformation = ref([]) as Ref<Array<{ index: number; type: string }>>;
+	const msg = ref("Ziehe die zu bearbeitende Datei in das Fenster oder wähle sie über den Button aus.");
+	const errorMsg = ref("");
+	const btn = ref("Starten");
+	const filePath = ref("");
+	const fileName = ref("");
+	const file: Ref<Uint8Array> = ref();
+	const changeInformation: Ref<Array<{ index: number; type: string }>> = ref([]);
+	const isLoading = ref(false);
+	const progress = ref(0);
+	const dragAndDropEvent = ref();
+	const passedArgumentValue = ref();
+
 	GlobalWorkerOptions.workerSrc = worker;
 
-	async function cleanFile() {
-		//RESET VALUES
+	onMounted(async () => {
+		argumentListener();
+		dragAndDropListener();
+	});
+
+	function resetData() {
 		filePath.value = "";
 		fileName.value = "";
 		file.value = undefined;
 		changeInformation.value = [];
+		isLoading.value = false;
+		progress.value = 0;
+		dragAndDropEvent.value = undefined;
+		dragAndDropListener();
+		passedArgumentValue.value = undefined;
+	}
 
-		console.log("clean File started");
-		await selectFile();
-		console.log("Lade gewählte Datei.");
-		await readFile();
-		console.log("finished selectFile");
-		console.log("Suche nach nötigen Änderungen.");
-		await getChangeInformation();
-		console.log("finished getChangeInformation");
-		console.log("Anpassung der Datei.");
-		await editFile();
-		console.log("finished editPdf");
-		console.log("Speicher die Datei.");
-		await saveFile();
-		console.log("finished savePdf");
+	async function cleanFile() {
+		try {
+			isLoading.value = true;
+			errorMsg.value = "Fehler beim Wählen der Datei.";
+			msg.value = "Wähle die zu bereinigende Datei...";
+			await selectFile();
+			progress.value = 17;
+			errorMsg.value = "Fehler beim Laden der Datei.";
+			msg.value = "Datei wird geladen...";
+			await readFile();
+			progress.value = 39;
+			errorMsg.value = "Fehler bei der Suche nach nötigen Änderungen.";
+			msg.value = "Suche nach nötigen Änderungen...";
+			await getChangeInformation();
+			progress.value = 55;
+			errorMsg.value = "Fehler beim Vornehmen der Änderungen.";
+			msg.value = "Änderungen werden vorgenommen...";
+			await editFile();
+			progress.value = 79;
+			errorMsg.value = "Fehler beim Speichern der neuen Datei.";
+			msg.value = "Datei wird gespeichert...";
+			await saveFile();
+			progress.value = 100;
+			errorMsg.value = "";
+			msg.value = "Bereinigung der Datei ist abgeschlossen.";
+			if (passedArgumentValue.value) {
+				await exit();
+			}
+		} catch (e) {
+			console.log(e);
+
+			//custom error type needed??
+			if (typeof e === "string") {
+				msg.value = `Error: ${e}`;
+			} else {
+				msg.value = `Error: ${errorMsg.value}`;
+			}
+		} finally {
+			resetData();
+			btn.value = "Nochmal";
+		}
 	}
 
 	async function selectFile() {
-		//GET FILE PATH
-		filePath.value = (await open({
-			multiple: false,
-			filters: [{ name: "PDF", extensions: ["pdf"] }],
-			directory: false,
-			title: "Öffnen",
-			// defaultPath: "",
-		})) as string;
-
+		if (passedArgumentValue.value) {
+			if (passedArgumentValue.value.slice(-4) === ".pdf") {
+				filePath.value = passedArgumentValue.value;
+			} else {
+				throw "Ungültige Datei.";
+			}
+		} else if (dragAndDropEvent.value) {
+			//PER DRAG AND DROP
+			//CHECK IF ONLY ONE FILE WAS DROPPED
+			if (dragAndDropEvent.value.payload.length === 1) {
+				//CHECK IF ITS AN PDF
+				if (dragAndDropEvent.value.payload[0].slice(-4) === ".pdf") {
+					filePath.value = dragAndDropEvent.value.payload[0];
+				} else {
+					throw "Ungültige Datei.";
+				}
+			} else {
+				throw "Es kann nur eine Datei bearbeitet werden.";
+			}
+		} else {
+			//PER BUTTON
+			filePath.value = (await open({
+				multiple: false,
+				filters: [{ name: "PDF", extensions: ["pdf"] }],
+				directory: false,
+				title: "Öffnen",
+				// defaultPath: "",
+			})) as string;
+		}
 		console.log(filePath.value);
 
-		//GET FILE NAME
 		fileName.value = filePath.value.split("\\").at(-1);
 	}
 
@@ -78,26 +150,16 @@
 
 	async function getChangeInformation() {
 		const doc = await getDocument(file.value).promise;
-		const fileContent = [];
 
-		console.log(doc.numPages);
-
-		for (let index = 0; index < doc.numPages; index++) {
+		for (let index = 0; index < doc.numPages - 1; index++) {
 			const textContent = ((await (await doc.getPage(index + 1)).getTextContent()).items as Array<TextItem>).map((x) => x.str);
 
 			//CHECK IF VALID PDF
 			if (index === 0 && textContent[0] !== "Foto: © Yuri Arcurs – Fotolia.com; Privat") {
-				console.log("Ungültige Datei");
-				break;
+				throw "Ungültige Datei.";
 			}
 
-			//CHECK IF LAST PAGE
-			if (index !== doc.numPages - 1) {
-				textContent.splice(0, textContent.length - 1);
-			} else {
-				textContent.splice(0, textContent.length - 3);
-				console.log(textContent);
-			}
+			textContent.splice(0, textContent.length - 1);
 
 			const textContentPageNumbers = textContent[0].match(/[0-9]+/g);
 
@@ -107,13 +169,7 @@
 			} else if (textContentPageNumbers[0] === textContentPageNumbers[1] && Number(textContentPageNumbers[1]) % 2 !== 0) {
 				changeInformation.value.unshift({ index: index, type: "add" });
 			}
-
-			//temp
-			fileContent.push(textContent[0]);
 		}
-		//temp
-		// console.log(changeInformation.value);
-		// console.log(fileContent);
 	}
 
 	async function editFile() {
@@ -138,5 +194,27 @@
 	async function saveFile() {
 		const newFilePath = filePath.value.replace(".pdf", "_bereinigt.pdf");
 		await writeBinaryFile({ path: newFilePath, contents: file.value });
+	}
+
+	async function dragAndDropListener() {
+		await once<string>("tauri://file-drop", (event) => {
+			//triggers multiple times :(
+			dragAndDropEvent.value = event;
+			cleanFile();
+			console.log("filedrop");
+		});
+	}
+
+	async function argumentListener() {
+		try {
+			const matches = await getMatches();
+			if (matches.args.path.value) {
+				passedArgumentValue.value = matches.args.path.value;
+				cleanFile();
+			}
+		} catch (error) {
+			msg.value = "Error: Fehler beim Wählen der Datei.";
+			resetData();
+		}
 	}
 </script>

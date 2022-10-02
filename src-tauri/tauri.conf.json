@@ -18,8 +18,21 @@
 			"fs": {
 				"all": true,
 				"scope": ["*"]
+			},
+			"process": {
+				"exit": true
 			}
 		},
+		"cli": {
+			"args": [
+				{
+				  "name": "path",
+				  "index": 1,
+				  "takesValue": true,
+				  "multiple": false
+				}
+			  ]
+			},
 		"bundle": {
 			"active": true,
 			"category": "Utility",
