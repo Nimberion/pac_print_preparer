@@ -1,23 +1,29 @@
 <template>
-	<div class="text-center text-sm grid grid-rows-[28px_108px_32px] place-items-center p-4">
+	<!-- 	.color1 {color: #000203;}
+			.color2 {color: #1f2735;}
+			.color3 {color: #c1b4a0;}
+			.color4 {color: #e8e2d7;}
+			.color5 {color: #f9f9f9;} -->
+	<div class="text-center text-sm grid grid-rows-[28px_108px_32px] place-items-center p-4 bg-[#f9f9f9] text-[#000203]">
 		<h1 class="text-xl font-bold">PAC Print Preparer</h1>
 		<div class="w-full">
 			<!-- LOADING BAR -->
-			<div v-if="isLoading" class="h-3 w-full border border-gray-400 mb-1">
-				<div class="h-full bg-gray-300 text-center text-white text-xs" :style="`width: ${progress}%;`"></div>
+			<div v-if="isLoading" class="h-3 w-full border border-[#1f2735] mb-1">
+				<div class="h-full bg-[#c1b4a0] text-xs" :style="`width: ${progress}%;`"></div>
 			</div>
 			<div>{{ msg }}</div>
 			<!-- <div :title="argument">{{ argument }}</div> -->
 		</div>
 		<button
-			class="w-28 mx-2 px-2 py-1 border border-gray-400 bg-gray-300 rounded-sm place-content-center flex"
-			:class="{ 'hover:bg-gray-200': !isLoading }"
+			class="w-28 mx-2 px-2 py-1 border border-[#1f2735] bg-[#c1b4a0] rounded-sm place-content-center flex"
+			:class="{ 'hover:bg-[#e8e2d7]': !isLoading }"
 			:disabled="isLoading"
 			@click="cleanFile"
 		>
 			<div v-if="!isLoading">{{ btn }}</div>
 			<!-- SPINNER -->
-			<div v-else class="animate-spin w-5 h-5 border-4 border-b-transparent border-gray-500 rounded-full" role="status"></div>
+			<div v-else class="animate-spin w-5 h-5 border-4 border-b-transparent border-[#e8e2d7] rounded-full" role="status"></div>
+			<!-- temp button to abbort needed? -->
 		</button>
 	</div>
 </template>
