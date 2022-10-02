@@ -49,8 +49,20 @@
 	GlobalWorkerOptions.workerSrc = worker;
 
 	onMounted(async () => {
-		argumentListener();
-		dragAndDropListener();
+		//SEARCH FOR PASSED ARGUMENTS
+		try {
+			const matches = await getMatches();
+			if (matches.args.path.value) {
+				passedArgumentValue.value = matches.args.path.value;
+				await cleanFile();
+			} else {
+				//START DRAG AND DROP LISTENER
+				dragAndDropListener();
+			}
+		} catch (error) {
+			msg.value = "Error: Fehler beim Wählen der Datei.";
+			resetData();
+		}
 	});
 
 	function resetData() {
@@ -113,7 +125,7 @@
 			if (passedArgumentValue.value.slice(-4) === ".pdf") {
 				filePath.value = passedArgumentValue.value;
 			} else {
-				throw "Ungültige Datei.";
+				throw "Ungültige Dateiendung.";
 			}
 		} else if (dragAndDropEvent.value) {
 			//PER DRAG AND DROP
@@ -123,7 +135,7 @@
 				if (dragAndDropEvent.value.payload[0].slice(-4) === ".pdf") {
 					filePath.value = dragAndDropEvent.value.payload[0];
 				} else {
-					throw "Ungültige Datei.";
+					throw "Ungültige Dateiendung.";
 				}
 			} else {
 				throw "Es kann nur eine Datei bearbeitet werden.";
@@ -156,7 +168,7 @@
 
 			//CHECK IF VALID PDF
 			if (index === 0 && textContent[0] !== "Foto: © Yuri Arcurs – Fotolia.com; Privat") {
-				throw "Ungültige Datei.";
+				throw "Ungültige Dateistruktur.";
 			}
 
 			textContent.splice(0, textContent.length - 1);
@@ -203,18 +215,5 @@
 			cleanFile();
 			console.log("filedrop");
 		});
-	}
-
-	async function argumentListener() {
-		try {
-			const matches = await getMatches();
-			if (matches.args.path.value) {
-				passedArgumentValue.value = matches.args.path.value;
-				cleanFile();
-			}
-		} catch (error) {
-			msg.value = "Error: Fehler beim Wählen der Datei.";
-			resetData();
-		}
 	}
 </script>
