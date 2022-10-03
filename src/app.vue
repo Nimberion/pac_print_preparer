@@ -39,6 +39,8 @@
 	import worker from "pdfjs-dist/build/pdf.worker.entry";
 	import { PageSizes, PDFDocument } from "pdf-lib";
 	import { TextItem } from "pdfjs-dist/types/src/display/api";
+	import { ErrorMessage } from "./models/enums/ErrorMessage";
+	import { ProgressMessage } from "./models/enums/ProgressMessage";
 
 	const msg = ref("Ziehe die zu bearbeitende Datei in das Fenster oder wähle sie über den Button aus.");
 	const errorMsg = ref("");
@@ -66,7 +68,7 @@
 				dragAndDropListener();
 			}
 		} catch (error) {
-			msg.value = "Error: Fehler beim Wählen der Datei.";
+			msg.value = ErrorMessage.SelectingFile;
 			resetData();
 		}
 	});
@@ -86,39 +88,40 @@
 	async function cleanFile() {
 		try {
 			isLoading.value = true;
-			errorMsg.value = "Fehler beim Wählen der Datei.";
-			msg.value = "Wähle die zu bereinigende Datei...";
+			errorMsg.value = ErrorMessage.SelectingFile;
+			msg.value = ProgressMessage.SelectFile;
 			await selectFile();
 			progress.value = 17;
-			errorMsg.value = "Fehler beim Laden der Datei.";
-			msg.value = "Datei wird geladen...";
+			errorMsg.value = ErrorMessage.LoadingFile;
+			msg.value = ProgressMessage.LoadingFile;
 			await readFile();
 			progress.value = 39;
-			errorMsg.value = "Fehler bei der Suche nach nötigen Änderungen.";
-			msg.value = "Suche nach nötigen Änderungen...";
+			errorMsg.value = ErrorMessage.CheckingForChanges;
+			msg.value = ProgressMessage.CheckingForChanges;
 			await getChangeInformation();
 			progress.value = 55;
-			errorMsg.value = "Fehler beim Vornehmen der Änderungen.";
-			msg.value = "Änderungen werden vorgenommen...";
+			errorMsg.value = ErrorMessage.EditingFile;
+			msg.value = ProgressMessage.EditingFile;
 			await editFile();
 			progress.value = 79;
-			errorMsg.value = "Fehler beim Speichern der neuen Datei.";
-			msg.value = "Datei wird gespeichert...";
+			errorMsg.value = ErrorMessage.SaveingFile;
+			msg.value = ProgressMessage.SaveingFile;
 			await saveFile();
 			progress.value = 100;
 			errorMsg.value = "";
-			msg.value = "Bereinigung der Datei ist abgeschlossen.";
+			msg.value = ProgressMessage.Done;
 			if (passedArgumentValue.value) {
 				await exit();
 			}
 		} catch (e) {
-			console.log(e);
-
+			const customErrors = Object.values(ErrorMessage);
 			//custom error type needed??
-			if (typeof e === "string") {
-				msg.value = `Error: ${e}`;
+			if (customErrors.includes(e)) {
+				// if (typeof e === "string") {
+				//inctanceof -> The right-hand side of an 'instanceof' expression must be of type 'any' or of a type assignable to the 'Function' interface type.
+				msg.value = e;
 			} else {
-				msg.value = `Error: ${errorMsg.value}`;
+				msg.value = errorMsg.value;
 			}
 		} finally {
 			resetData();
@@ -131,7 +134,7 @@
 			if (passedArgumentValue.value.slice(-4) === ".pdf") {
 				filePath.value = passedArgumentValue.value;
 			} else {
-				throw "Ungültige Dateiendung.";
+				throw ErrorMessage.FileExtension;
 			}
 		} else if (dragAndDropEvent.value) {
 			//PER DRAG AND DROP
@@ -141,10 +144,10 @@
 				if (dragAndDropEvent.value.payload[0].slice(-4) === ".pdf") {
 					filePath.value = dragAndDropEvent.value.payload[0];
 				} else {
-					throw "Ungültige Dateiendung.";
+					throw ErrorMessage.FileExtension;
 				}
 			} else {
-				throw "Es kann nur eine Datei bearbeitet werden.";
+				throw ErrorMessage.MultipleFiles;
 			}
 		} else {
 			//PER BUTTON
@@ -153,7 +156,6 @@
 				filters: [{ name: "PDF", extensions: ["pdf"] }],
 				directory: false,
 				title: "Öffnen",
-				// defaultPath: "",
 			})) as string;
 		}
 		console.log(filePath.value);
@@ -174,7 +176,7 @@
 
 			//CHECK IF VALID PDF
 			if (index === 0 && textContent[0] !== "Foto: © Yuri Arcurs – Fotolia.com; Privat") {
-				throw "Ungültige Dateistruktur.";
+				throw ErrorMessage.FileStructure;
 			}
 
 			textContent.splice(0, textContent.length - 1);
@@ -210,7 +212,7 @@
 	}
 
 	async function saveFile() {
-		const newFilePath = filePath.value.replace(".pdf", "_bereinigt.pdf");
+		const newFilePath = filePath.value.replace(".pdf", "_druckbereit.pdf");
 		await writeBinaryFile({ path: newFilePath, contents: file.value });
 	}
 
