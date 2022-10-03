@@ -13,10 +13,11 @@
 	"tauri": {
 		"allowlist": {
 			"dialog": {
-				"all": true
+				"open": true
 			},
 			"fs": {
-				"all": true,
+				"readFile": true,
+				"writeFile": true,
 				"scope": ["*"]
 			},
 			"process": {
