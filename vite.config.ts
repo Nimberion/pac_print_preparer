@@ -1,5 +1,7 @@
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
+import Unocss from "unocss/vite";
+import { presetAttributify, presetUno, presetWind } from "unocss";
 
 export default defineConfig({
 	clearScreen: false,
@@ -13,5 +15,10 @@ export default defineConfig({
 		minify: !process.env.TAURI_DEBUG ? "esbuild" : false,
 		sourcemap: !!process.env.TAURI_DEBUG,
 	},
-	plugins: [vue()],
+	plugins: [
+		vue(),
+		Unocss({
+			presets: [presetAttributify(), presetWind(), presetUno()],
+		}),
+	],
 });

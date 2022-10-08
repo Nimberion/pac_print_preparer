@@ -1,9 +1,4 @@
 <template>
-	<!-- 	.color1 {color: #000203;}
-			.color2 {color: #1f2735;}
-			.color3 {color: #c1b4a0;}
-			.color4 {color: #e8e2d7;}
-			.color5 {color: #f9f9f9;} -->
 	<div class="text-center text-sm grid grid-rows-[28px_108px_32px] place-items-center p-4 bg-[#f9f9f9] text-[#000203]">
 		<h1 class="text-xl font-bold">PAC Print Preparer</h1>
 		<div class="w-full">
@@ -12,7 +7,6 @@
 				<div class="h-full bg-[#c1b4a0] text-xs" :style="`width: ${progress}%;`"></div>
 			</div>
 			<div>{{ msg }}</div>
-			<!-- <div :title="argument">{{ argument }}</div> -->
 		</div>
 		<button
 			class="w-28 mx-2 px-2 py-1 border border-[#1f2735] bg-[#c1b4a0] rounded-sm place-content-center flex"
@@ -23,7 +17,6 @@
 			<div v-if="!isLoading">{{ btn }}</div>
 			<!-- SPINNER -->
 			<div v-else class="animate-spin w-5 h-5 border-4 border-b-transparent border-[#e8e2d7] rounded-full" role="status"></div>
-			<!-- temp button to abbort needed? -->
 		</button>
 	</div>
 </template>
@@ -104,8 +97,8 @@
 			msg.value = ProgressMessage.EditingFile;
 			await editFile();
 			progress.value = 79;
-			errorMsg.value = ErrorMessage.SaveingFile;
-			msg.value = ProgressMessage.SaveingFile;
+			errorMsg.value = ErrorMessage.SavingFile;
+			msg.value = ProgressMessage.SavingFile;
 			await saveFile();
 			progress.value = 100;
 			errorMsg.value = "";
@@ -115,10 +108,7 @@
 			}
 		} catch (e) {
 			const customErrors = Object.values(ErrorMessage);
-			//custom error type needed??
 			if (customErrors.includes(e)) {
-				// if (typeof e === "string") {
-				//inctanceof -> The right-hand side of an 'instanceof' expression must be of type 'any' or of a type assignable to the 'Function' interface type.
 				msg.value = e;
 			} else {
 				msg.value = errorMsg.value;
@@ -218,7 +208,6 @@
 
 	async function dragAndDropListener() {
 		await once<string>("tauri://file-drop", (event) => {
-			//triggers multiple times :(
 			dragAndDropEvent.value = event;
 			cleanFile();
 			console.log("filedrop");

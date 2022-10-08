@@ -7,8 +7,8 @@
 		"distDir": "../dist"
 	},
 	"package": {
-		"productName": "pac_print_preparer",
-		"version": "0.1.0"
+		"productName": "PAC Print Preparer",
+		"version": "1.0.0"
 	},
 	"tauri": {
 		"allowlist": {

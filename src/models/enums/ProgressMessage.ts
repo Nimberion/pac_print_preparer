@@ -3,6 +3,6 @@ export enum ProgressMessage {
 	LoadingFile = "Datei wird geladen...",
 	CheckingForChanges = "Suche nach nötigen Änderungen...",
 	EditingFile = "Änderungen werden vorgenommen...",
-	SaveingFile = "Datei wird gespeichert...",
+	SavingFile = "Datei wird gespeichert...",
 	Done = "Bereinigung der Datei ist abgeschlossen.",
 }
