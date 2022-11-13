@@ -142,8 +142,6 @@
 				title: "Öffnen",
 			})) as string;
 		}
-		console.log(filePath.value);
-
 		fileName.value = filePath.value.split("\\").at(-1);
 	}
 
@@ -190,8 +188,6 @@
 			}
 		}
 		//CONVERT newPdf TO Uint8Array
-		console.log("save");
-
 		file.value = await newPdf.save();
 	}
 
