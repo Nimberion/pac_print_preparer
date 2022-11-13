@@ -3,12 +3,12 @@
 	"build": {
 		"beforeBuildCommand": "",
 		"beforeDevCommand": "",
-		"devPath": "http://localhost:8080",
+		"devPath": "http://localhost:8085",
 		"distDir": "../dist"
 	},
 	"package": {
 		"productName": "PAC Print Preparer",
-		"version": "1.0.0"
+		"version": "1.1.0"
 	},
 	"tauri": {
 		"allowlist": {

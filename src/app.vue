@@ -41,7 +41,6 @@
 	const filePath = ref("");
 	const fileName = ref("");
 	const file: Ref<Uint8Array> = ref();
-	const changeInformation: Ref<Array<{ index: number; type: string }>> = ref([]);
 	const isLoading = ref(false);
 	const progress = ref(0);
 	const dragAndDropEvent = ref();
@@ -70,7 +69,6 @@
 		filePath.value = "";
 		fileName.value = "";
 		file.value = undefined;
-		changeInformation.value = [];
 		isLoading.value = false;
 		progress.value = 0;
 		dragAndDropEvent.value = undefined;
@@ -88,10 +86,6 @@
 			errorMsg.value = ErrorMessage.LoadingFile;
 			msg.value = ProgressMessage.LoadingFile;
 			await readFile();
-			progress.value = 39;
-			errorMsg.value = ErrorMessage.CheckingForChanges;
-			msg.value = ProgressMessage.CheckingForChanges;
-			await getChangeInformation();
 			progress.value = 55;
 			errorMsg.value = ErrorMessage.EditingFile;
 			msg.value = ProgressMessage.EditingFile;
@@ -158,10 +152,16 @@
 		file.value = await readBinaryFile(filePath.value);
 	}
 
-	async function getChangeInformation() {
+	async function editFile() {
 		const doc = await getDocument(file.value).promise;
 
-		for (let index = 0; index < doc.numPages - 1; index++) {
+		//EDIT PDF
+		const oldPdf = await PDFDocument.load(file.value);
+		const newPdf = await PDFDocument.create();
+		const pageIndices = Array.from(oldPdf.getPages().keys());
+		const oldPdfPages = await newPdf.copyPages(oldPdf, pageIndices);
+
+		for (let index = 0; index < doc.numPages; index++) {
 			const textContent = ((await (await doc.getPage(index + 1)).getTextContent()).items as Array<TextItem>).map((x) => x.str);
 
 			//CHECK IF VALID PDF
@@ -171,34 +171,28 @@
 
 			textContent.splice(0, textContent.length - 1);
 
+			const isNotCoverSheet = textContent[0].match(/Seite [0-9]+ von [0-9]+/);
 			const textContentPageNumbers = textContent[0].match(/[0-9]+/g);
+			const lastPage = doc.numPages - 1;
 
-			//FILL CHANGEINFORMATION
-			if (!textContent[0].match(/Seite [0-9]+ von [0-9]+/)) {
-				changeInformation.value.unshift({ index: index, type: "delete" });
-			} else if (textContentPageNumbers[0] === textContentPageNumbers[1] && Number(textContentPageNumbers[1]) % 2 !== 0) {
-				changeInformation.value.unshift({ index: index, type: "add" });
+			//GET CHANGEINFORMATION & CREATE newPdf
+			if (isNotCoverSheet) {
+				//COPY PAGE TO newPdf
+				newPdf.addPage(oldPdfPages[index]);
+
+				if (textContentPageNumbers[0] === textContentPageNumbers[1] && Number(textContentPageNumbers[1]) % 2 !== 0) {
+					//ADD EMPTY PAGE IF NUMBER OF PAGES IST UNEVEN
+					newPdf.insertPage(newPdf.getPageCount(), PageSizes.A4);
+				}
+			} else if (index === lastPage) {
+				//COPY LAST PAGE TO newPdf, BECAUSE OF DIFFERENT PAGE STRUCTURE
+				newPdf.addPage(oldPdfPages[index]);
 			}
 		}
-	}
+		//CONVERT newPdf TO Uint8Array
+		console.log("save");
 
-	async function editFile() {
-		if (changeInformation.value.length > 0) {
-			const oldPdf = await PDFDocument.load(file.value);
-
-			changeInformation.value.forEach((item) => {
-				if (item.type === "delete") {
-					oldPdf.removePage(item.index);
-				} else {
-					oldPdf.insertPage(item.index + 1, PageSizes.A4);
-				}
-			});
-
-			//COPIE FILE TO REMOVE PAGE STRUCTURE DATA ERROR
-			const newPdf = await oldPdf.copy();
-
-			file.value = await newPdf.save();
-		}
+		file.value = await newPdf.save();
 	}
 
 	async function saveFile() {
@@ -210,7 +204,6 @@
 		await once<string>("tauri://file-drop", (event) => {
 			dragAndDropEvent.value = event;
 			cleanFile();
-			console.log("filedrop");
 		});
 	}
 </script>

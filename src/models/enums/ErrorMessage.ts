@@ -1,7 +1,6 @@
 export enum ErrorMessage {
 	SelectingFile = "Error: Fehler beim Wählen der Datei.",
 	LoadingFile = "Error: Fehler beim Laden der Datei.",
-	CheckingForChanges = "Error: Fehler bei der Suche nach nötigen Änderungen.",
 	EditingFile = "Error: Fehler beim Vornehmen der Änderungen.",
 	SavingFile = "Error: Fehler beim Speichern der neuen Datei.",
 	FileExtension = "Error: Ungültige Dateiendung.",

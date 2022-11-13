@@ -5,7 +5,7 @@ import "@unocss/reset/tailwind.css";
 import "uno.css";
 const app = createApp(App);
 
-import { unifiedApp } from "./plugins/unified/unified-app";
-app.use(unifiedApp);
+// import { unifiedApp } from "./plugins/unified/unified-app";
+// app.use(unifiedApp);
 
 app.mount("#app");

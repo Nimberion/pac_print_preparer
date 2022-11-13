@@ -2,7 +2,7 @@
 	"name": "pac_print_preparer",
 	"description": "",
 	"private": true,
-	"version": "1.0.0",
+	"version": "1.1.0",
 	"type": "module",
 	"scripts": {
 		"serve": "vite",

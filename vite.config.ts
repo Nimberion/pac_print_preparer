@@ -6,7 +6,7 @@ import { presetAttributify, presetUno, presetWind } from "unocss";
 export default defineConfig({
 	clearScreen: false,
 	server: {
-		port: 8080,
+		port: 8085,
 		strictPort: true,
 	},
 	envPrefix: ["VITE_", "TAURI_"],
