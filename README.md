@@ -1,3 +1,5 @@
 # PAC Print Preparer
 
-This tool prepares the results from https://www.kompetenzanalyse-pac.de/ for duplex printing and removes the cover pages.
+![P3 Screenshot](./public/p3_screenshot.jpg)
+
+This tool prepares the results from https://www.kompetenzanalyse-pac.de/ for duplex printing by removing the cover pages and inserting empty pages if needed.
